@@ -222,6 +222,51 @@ function register_events() {
 
 }
 
+$(function() {
+    $("#skill_tables").delegate("#warrior_skills input", "change",
+        function() {
+            warrior_prac($(this).parents('tr').data('skill'));
+        }
+    );
+
+    register_events();
+    build_skill_tables();
+});
+
+// HERE BE DRAGONS {{{
+
+/*
+ * Skill calculations are based off `route` that is determined by your
+ * stats. Each set of skills has a starting value based off of those
+ * stats, and each subsequent practice is a function of the previous
+ * practice.
+ *
+ * Warrior skills start at STR / 2 + DEX / 4 + CON / 4
+ * Rogue skills start at DEX * 3 / 4 + INT / 4
+ * Hunter skills start at (STR + INT + WIL + DEX) / 4
+ *
+ * On each successive practice session, your percentage in a given
+ * skill is incremented based on your current value and starting
+ * value.
+ *
+ * Below 20%, you gain <start> percentage.
+ * Below 40%, you gain 80% of <start>.
+ * Below 60%, you gain 59.29% of <start>.
+ * Below 80%, you gain 40% of <start>.
+ * Below 90%, you gain 20% of <start>
+ * Above 90, you gain 1 percentage each session.
+ *
+ * Some skills are related to other skills, and lend residuals to them.
+ * Groups:
+ *      long blades, medium blades, fencing blades
+ *      sneak, ranger sneak
+ *
+ * All residuals are 40% of each skill in the group, and affect
+ * your starting percentage only. This means that having 91%
+ * ranger sneak, and then practicing sneak, will not increase your
+ * ranger sneak by 40% of your sneak skill.
+ */
+
 
 function skill_level(i) {
     // Returns the skill level given the actual practice amount
@@ -230,7 +275,7 @@ function skill_level(i) {
 }
 
 
-function calculate_level(faction, sessions) {
+function calculate_required_level(faction, sessions) {
     // Determines the required level based on the number of
     // used practices and the faction of the character.
 
@@ -259,7 +304,30 @@ function calculate_level(faction, sessions) {
 }
 
 
-function increment_skill(current, start) {
+function get_starting_percentage(skill) {
+    // returns the starting percentage for a given skill
+    var cls = skillsets.get_class(skill);
+    var ch = get_character_info();
+
+    if(cls == 'warrior') {
+        return Math.floor(ch.str / 2) +
+               Math.floor(ch.dex / 4) +
+               Math.floor(ch.con / 4);
+    }
+
+    if(cls == 'rogue') {
+        return Math.floor(ch.dex * 3 / 4) +
+               Math.floor(ch.int / 4);
+    }
+
+    if(cls == 'hunter') {
+        return Math.floor((ch.str + ch.int + ch.wil + ch.dex) / 4.0)
+    }
+
+}
+
+
+function increment_percentage(current, start) {
     // Returns the next percentage for an arbitrary skill, based
     // on the current percentage and the starting percentage.
     // This is really a function of the starting value.
@@ -287,7 +355,82 @@ function increment_skill(current, start) {
 }
 
 
-$(function() {
-    register_events();
-    build_skill_tables();
-});
+function get_percentage(sessions) {
+    // returns the actual percentage based on the number of
+    // practice sessions spent
+}
+
+
+function get_skill_percentage(skill) {
+    // Returns the current skill percentage for the given skill
+    var sessions = $("#skill_tables tr[data-skill=" + skill + "] input").val();
+    return get_percentage(sessions);
+}
+
+
+function get_residuals(skill) {
+    // for a given skill, pull down all of the residuals
+    var residual = 0;
+    var group = [];
+
+    // all residuals are 40% of related skills
+    var residual_percent = 0.4;
+
+    // long blades, medium blades, and fencing blades all
+    // gain a residuals from any other one of the skills
+    if(skill == "longblades" || skill == "mediumblades" || skill == "fencingblades") {
+        var group = ['longblades', 'mediumblades', 'fencingblades'];
+    }
+
+    var idx = $.inArray(skill, group);
+    if(idx !== -1) {
+        // remove the current skill from the group
+        group = group.slice(idx, idx+1);
+    }
+
+    $.each(group, function(i, groupskill) {
+        // for each skill in the group, get the percentage
+        // and add the residual
+        //var skillper += get_skill_percentage(groupskill)
+        residual += Math.floor(skillper * residual_percent);
+    });
+
+    return residual;
+}
+
+
+function get_character_info() {
+    var ch = {}
+    ch.sex = $("#sex").val();
+    ch.faction = $("#faction").val();
+    ch.cls = $("#class").val();
+
+    var stats = ['str', 'int', 'wil', 'dex', 'con'];
+    $.each(stats, function(i, stat) {
+        ch[stat] = parseInt($("#stats_" + stat).val(), 10);
+    });
+
+    return ch;
+}
+
+
+function update_warrior_skill(skill, dir) {
+    // get the current skill level
+    // FIXME: This shouldn't have to call into the DOM
+    var sessions = $("#skill_tables tr[data-skill=" + skill + "] input").val();
+    console.log(skill + ": " + current);
+
+    // get the current character information
+    var ch = get_character_info();
+
+    // the starting percentage for a warrior skill
+    var start = Math.floor(ch.str / 2) +
+                Math.floor(ch.dex / 4) +
+                Math.floor(ch.con / 4);
+
+    var residual = get_residuals(skill);
+
+}
+
+// }}}
+
