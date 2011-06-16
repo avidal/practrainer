@@ -1,0 +1,27 @@
+body {
+    margin: auto;
+    width: 960px;
+}
+
+#required_pracs, #required_level {
+    font-weight: bold;
+}
+
+#skill_tables {
+    margin-top: 20px;
+}
+
+#skill_tables table {
+    border: 1px solid black;
+    float: left;
+    width: 30%;
+}
+
+#skill_tables table tr td {
+    padding: 5px;
+    border: 1px solid gray;
+}
+
+#skill_tables td.skill-sessions input {
+    width: 40px;
+}
