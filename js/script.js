@@ -73,6 +73,12 @@ function build_skill_tables() {
 function register_events() {
     console.log('Registering events.');
 
+    // bind to the change event on any of the character
+    // attribute options
+    $("#character_info select").change(function() {
+        console.log('Character information changed.');
+    });
+
     // make sure they pick a valid class
     $("#faction").change(function() {
         if($(this).val() != "human") {
