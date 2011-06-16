@@ -1,0 +1,72 @@
+var fs = require('fs'),
+    http = require('http'),
+    path = require('path')
+    sys = require('sys'),
+    url = require('url'),
+
+http.createServer(handle_request).listen(5002, '0.0.0.0');
+
+function handle_request(request, response) {
+    console.log("[REQUEST] " + request.url);
+    var uri = url.parse(request.url).pathname;
+
+    if(uri == "/") {
+        // set uri to index.html
+        uri = "/index.html";
+    }
+
+    var filename = path.join(process.cwd(), uri);
+
+    path.exists(filename, function(exists) {
+        if(!exists) {
+            send_404(response);
+            return;
+        }
+
+        // read in the file and send it along
+        fs.readFile(filename, "binary", function(err, file) {
+            if(err) {
+                send_500(response, err);
+                return;
+            }
+
+            response.writeHead(200, {
+                "Content-Length": file.length,
+                "Content-Type": get_mimetype(filename),
+            });
+
+            response.write(file, "binary");
+            response.end();
+
+        });
+
+    });
+}
+
+function get_mimetype(filename) {
+    var ext = filename.replace(/.*[\.\/]/, '').toLowerCase();
+    var types = {
+        "html": "text/html",
+        "js": "application/javascript",
+        "css": "text/css",
+        "ico": "image/x-icon"
+    }
+    return types[ext] || "application/octet-stream";
+}
+
+function send_404(response) {
+    response.writeHead(404, {"Content-Type": "text/plain"});
+    response.write("404 Not Found\n");
+    response.end();
+    return;
+}
+
+function send_500(response, err) {
+    response.writeHead(500, {"Content-Type": "text/plain"});
+    response.write("500 Internal Server Error\n");
+    response.write(err + "\n");
+    response.end();
+    return;
+}
+
+console.log('Server running at http://0.0.0.0:5002/');
