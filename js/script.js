@@ -73,6 +73,25 @@ function build_skill_tables() {
 function register_events() {
     console.log('Registering events.');
 
+    // make sure they pick a valid class
+    $("#faction").change(function() {
+        if($(this).val() != "human") {
+            // if they already have channeler selected, move them to
+            // warrior
+            var cls = $("#class").val();
+            if(cls == "channeler") {
+                $("#class").val('warrior');
+            }
+
+            // be sure to disable channelers
+            $("#class option[value='channeler']").attr('disabled', 'disabled');
+
+        } else {
+            // re-enable channelers
+            $("#class option[value='channeler']").removeAttr('disabled');
+        }
+    });
+
     // bind the change event for all of the practice inputs
     $('#skill_tables').delegate(
         "td.skill-sessions input",
