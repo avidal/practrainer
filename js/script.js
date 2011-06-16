@@ -72,7 +72,8 @@ function build_skill_tables() {
 
         $.each(skillset, function(i, skill) {
             // for each skill, insert a row into the table
-            var $row = $("<tr data-skill='"+skill[1]+"'>");
+            var col = i % 2 ? "odd" : "even";
+            var $row = $("<tr class='"+col+"' data-skill='"+skill[1]+"'>");
             $row.append("<td class='skill-name'>" + skill[0] + "</td>");
             $row.append("<td class='skill-percent'><span>0</span>%</td>");
             $row.append("<td class='skill-sessions'><input value='0'></td>");
@@ -83,6 +84,17 @@ function build_skill_tables() {
 
 
 function register_events() {
+    // bind to the reset link
+    $("#reset_link").click(function(evt) {
+        // prevent the page from moving
+        evt.preventDefault();
+
+        $("#skill_tables td.skill-sessions input").each(function() {
+            $(this).val(0);
+            $(this).change();
+        });
+
+    });
     // bind to the change event on any of the character
     // attribute options
     $("#character_info select").change(function() {

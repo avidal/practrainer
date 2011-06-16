@@ -37,7 +37,7 @@
                 </select>
                 <select id="class">
                     <option value="warrior">Warrior</option>
-                    <option value="hunter">Hunter</option>
+                    <option value="hunter" selected>Hunter</option>
                     <option value="rogue">Rogue</option>
                     <option value="channeler">Channeler</option>
                 </select>
@@ -56,8 +56,9 @@
                     <option value="15">Str: 15</option>
                     <option value="16">Str: 16</option>
                     <option value="17">Str: 17</option>
-                    <option value="18">Str: 18</option>
+                    <option value="18" selected>Str: 18</option>
                     <option value="19">Str: 19</option>
+                    <option value="20">Str: 20</option>
                 </select>
                 <select id="stats_int">
                     <option value="5">Int: 5</option>
@@ -65,7 +66,7 @@
                     <option value="7">Int: 7</option>
                     <option value="8">Int: 8</option>
                     <option value="9">Int: 9</option>
-                    <option value="10">Int: 10</option>
+                    <option value="10" selected>Int: 10</option>
                     <option value="11">Int: 11</option>
                     <option value="12">Int: 12</option>
                     <option value="13">Int: 13</option>
@@ -82,7 +83,7 @@
                     <option value="7">Wil: 7</option>
                     <option value="8">Wil: 8</option>
                     <option value="9">Wil: 9</option>
-                    <option value="10">Wil: 10</option>
+                    <option value="10" selected>Wil: 10</option>
                     <option value="11">Wil: 11</option>
                     <option value="12">Wil: 12</option>
                     <option value="13">Wil: 13</option>
@@ -107,7 +108,7 @@
                     <option value="15">Dex: 15</option>
                     <option value="16">Dex: 16</option>
                     <option value="17">Dex: 17</option>
-                    <option value="18">Dex: 18</option>
+                    <option value="18" selected>Dex: 18</option>
                     <option value="19">Dex: 19</option>
                 </select>
                 <select id="stats_con">
@@ -124,7 +125,7 @@
                     <option value="15">Con: 15</option>
                     <option value="16">Con: 16</option>
                     <option value="17">Con: 17</option>
-                    <option value="18">Con: 18</option>
+                    <option value="18" selected>Con: 18</option>
                     <option value="19">Con: 19</option>
                 </select>
 
@@ -133,6 +134,8 @@
                 To get the following skills, I need to use
                 <span id="required_pracs">0</span> practice sessions,
                 which requires level <span id="required_level">0</span>.
+
+                <a href="#" id="reset_link">Click here to reset</a>
 
             </header>
 
@@ -173,7 +176,20 @@
             </section>
         </div>
 
+        <div style='float:none;clear:both;'></div>
+
         <footer>
+            <h2>Halp!</h2>
+            <p>
+                Place the cursor inside one of the skill textboxes, and use
+                up, down, left, right, plus or minus to add/subtract a level
+                from the specified skill. The required level and practices will
+                be updated automatically.
+            </p>
+            <p>
+                If you change your faction, class, or stats, everything will
+                be updated automatically.
+            </p>
         </footer>
     </div>
 

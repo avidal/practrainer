@@ -26,3 +26,7 @@ body {
 #skill_tables td.skill-sessions input {
     width: 40px;
 }
+
+#skill_tables tr.even {
+    background-color: #eee;
+}
