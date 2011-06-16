@@ -15,6 +15,7 @@ body {
     border: 1px solid black;
     float: left;
     width: 30%;
+    margin: 5px;
 }
 
 #skill_tables table tr td {
