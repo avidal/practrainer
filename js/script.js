@@ -2,6 +2,7 @@
  * Each skill is represented by a list of display name, code name, and an
  * optional boolean indicating whether or not this is a leveled skill.
  */
+
 var skillsets = {
     'warrior': [
         ['Shield parry', 'shieldparry'],
@@ -61,38 +62,6 @@ skillsets.get_class = function(skill) {
     return ret;
 }
 
-var skillgroups = [
-    ['longblades', 'mediumblades', 'fencingblades'],
-    ['sneak', 'rangersneak']
-];
-
-skillgroups.contains = function(skill) {
-    // returns a boolean indicating whether or not the passed
-    // skill is in a skillgroup
-    var yesno = false;
-    $.each(skillgroups, function(i, group) {
-        yesno = !!$.inArray(group, skill);
-        return false;
-    });
-
-    return yesno;
-
-}
-
-skillgroups.group = function(skill) {
-    // returns the skill group for a given skill
-    var group = [];
-    $.each(skillgroups, function(i, group_) {
-        if($.inArray(skill, group_) >= 0) {
-            group = group_;
-            return false;
-        }
-    });
-
-    return group;
-
-}
-
 
 function build_skill_tables() {
     // builds out the actual HTML for the skill tables
@@ -150,8 +119,8 @@ function register_events() {
         "td.skill-sessions input",
         "change",
         function() {
-            var code = $(this).parents('tr').data('skill');
-            console.log(code + ' changed.');
+            var skill = $(this).parents('tr').data('skill');
+            update_skill(skill);
         }
     );
 
@@ -223,12 +192,6 @@ function register_events() {
 }
 
 $(function() {
-    $("#skill_tables").delegate("#warrior_skills input", "change",
-        function() {
-            warrior_prac($(this).parents('tr').data('skill'));
-        }
-    );
-
     register_events();
     build_skill_tables();
 });
@@ -265,6 +228,16 @@ $(function() {
  * your starting percentage only. This means that having 91%
  * ranger sneak, and then practicing sneak, will not increase your
  * ranger sneak by 40% of your sneak skill.
+ *
+ * For now, I'm not handling residuals since the current math seems
+ * to be incorrect. The existing prac trainer, that this is based off
+ * of, sets the residual amount equal to 40% of the last practiced skill
+ * from that skill group, which I really don't think is correct.
+ *
+ * Questions that need to be answered:
+ *  * What happens when you practice long blades to 20%, which gives you
+ *      8% in medium blades/fencing blades, and then you practice medium
+ *      blades? How does that affect fencing/long blades?
  */
 
 
@@ -350,14 +323,25 @@ function increment_percentage(current, start) {
         incr = 1;
     }
 
+    console.log('Incrementing percentage by ' + incr);
     return current + incr;
 
 }
 
 
-function get_percentage(sessions) {
+function get_percentage(skill, sessions) {
     // returns the actual percentage based on the number of
     // practice sessions spent
+    var start = get_starting_percentage(skill);
+    var perc = 0;
+
+    console.log('starting percentage: ' + start + ';sessions: ' + sessions);
+
+    for(var i = 0; i < sessions; i++) {
+        perc = increment_percentage(perc, start);
+    }
+
+    return perc;
 }
 
 
@@ -365,37 +349,6 @@ function get_skill_percentage(skill) {
     // Returns the current skill percentage for the given skill
     var sessions = $("#skill_tables tr[data-skill=" + skill + "] input").val();
     return get_percentage(sessions);
-}
-
-
-function get_residuals(skill) {
-    // for a given skill, pull down all of the residuals
-    var residual = 0;
-    var group = [];
-
-    // all residuals are 40% of related skills
-    var residual_percent = 0.4;
-
-    // long blades, medium blades, and fencing blades all
-    // gain a residuals from any other one of the skills
-    if(skill == "longblades" || skill == "mediumblades" || skill == "fencingblades") {
-        var group = ['longblades', 'mediumblades', 'fencingblades'];
-    }
-
-    var idx = $.inArray(skill, group);
-    if(idx !== -1) {
-        // remove the current skill from the group
-        group = group.slice(idx, idx+1);
-    }
-
-    $.each(group, function(i, groupskill) {
-        // for each skill in the group, get the percentage
-        // and add the residual
-        //var skillper += get_skill_percentage(groupskill)
-        residual += Math.floor(skillper * residual_percent);
-    });
-
-    return residual;
 }
 
 
@@ -414,21 +367,16 @@ function get_character_info() {
 }
 
 
-function update_warrior_skill(skill, dir) {
+function update_skill(skill) {
     // get the current skill level
     // FIXME: This shouldn't have to call into the DOM
-    var sessions = $("#skill_tables tr[data-skill=" + skill + "] input").val();
-    console.log(skill + ": " + current);
+    var $row = $("#skill_tables tr[data-skill=" + skill + "]");
 
-    // get the current character information
-    var ch = get_character_info();
+    var sessions = $row.find('input').val();
+    console.log(skill + ": " + sessions);
 
-    // the starting percentage for a warrior skill
-    var start = Math.floor(ch.str / 2) +
-                Math.floor(ch.dex / 4) +
-                Math.floor(ch.con / 4);
-
-    var residual = get_residuals(skill);
+    var perc = get_percentage(skill, sessions);
+    $row.find('.skill-percent span').html(perc);
 
 }
 
