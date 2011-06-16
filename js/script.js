@@ -62,6 +62,28 @@ skillsets.get_class = function(skill) {
     return ret;
 }
 
+skillsets.has_levels = function(skill) {
+    // returns whether or not the supplied skill is one that
+    // gets levels
+    var ret = false;
+    $.each(skillsets, function(cls, skillset) {
+        $.each(skillset, function(i, skill_) {
+            if(skill == skill_[1]) {
+                if(skill_.length == 3) {
+                    ret = skill_[2];
+                } else {
+                    ret = false;
+                }
+
+                return false;
+            }
+        });
+    });
+
+    return ret;
+
+}
+
 
 function build_skill_tables() {
     // builds out the actual HTML for the skill tables
@@ -75,7 +97,14 @@ function build_skill_tables() {
             var col = i % 2 ? "odd" : "even";
             var $row = $("<tr class='"+col+"' data-skill='"+skill[1]+"'>");
             $row.append("<td class='skill-name'>" + skill[0] + "</td>");
-            $row.append("<td class='skill-percent'><span>0</span>%</td>");
+
+            if(skillsets.has_levels(skill[1])) {
+                $row.append("<td class='skill-percent'><span>0</span>% \
+                            L<span class='skill-level'>0</span></td>");
+            } else {
+                $row.append("<td class='skill-percent'><span>0</span>%</td>");
+            }
+
             $row.append("<td class='skill-sessions'><input value='0'></td>");
             $tbody.append($row);
         });
@@ -433,7 +462,14 @@ function update_skill(skill) {
     var sessions = $row.find('input').val();
 
     var perc = get_percentage(skill, sessions);
-    $row.find('.skill-percent span').html(perc);
+    $row.find('.skill-percent span').not('span.skill-level').html(perc);
+
+    // if this is a skill with levels then we should display the level
+    var has_levels = skillsets.has_levels(skill);
+    if(!has_levels) return;
+
+    var skill_lev = skill_level(perc);
+    $row.find('span.skill-level').html(skill_lev);
 
 }
 
