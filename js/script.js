@@ -169,6 +169,12 @@ function register_events() {
 }
 
 
+function skill_level(i) {
+    // Returns the skill level given the actual practice amount
+    // Each level activates at a multiple of 14.
+    return Math.floor(i / 14);
+}
+
 $(function() {
     register_events();
     build_skill_tables();
