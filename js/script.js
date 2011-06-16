@@ -46,6 +46,53 @@ var skillsets = {
     ]
 };
 
+skillsets.get_class = function(skill) {
+    // returns the class associated with a given skill
+    var ret = '';
+    $.each(skillsets, function(cls, skillset) {
+        $.each(skillset, function(i, skill_) {
+            if(skill == skill_[1]) {
+                ret = cls;
+                return false;
+            }
+        });
+    });
+
+    return ret;
+}
+
+var skillgroups = [
+    ['longblades', 'mediumblades', 'fencingblades'],
+    ['sneak', 'rangersneak']
+];
+
+skillgroups.contains = function(skill) {
+    // returns a boolean indicating whether or not the passed
+    // skill is in a skillgroup
+    var yesno = false;
+    $.each(skillgroups, function(i, group) {
+        yesno = !!$.inArray(group, skill);
+        return false;
+    });
+
+    return yesno;
+
+}
+
+skillgroups.group = function(skill) {
+    // returns the skill group for a given skill
+    var group = [];
+    $.each(skillgroups, function(i, group_) {
+        if($.inArray(skill, group_) >= 0) {
+            group = group_;
+            return false;
+        }
+    });
+
+    return group;
+
+}
+
 
 function build_skill_tables() {
     // builds out the actual HTML for the skill tables
