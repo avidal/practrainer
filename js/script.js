@@ -175,6 +175,64 @@ function skill_level(i) {
     return Math.floor(i / 14);
 }
 
+
+function calculate_level(faction, sessions) {
+    // Determines the required level based on the number of
+    // used practices and the faction of the character.
+
+    // Humans and seachan get 5 pracs per level up to 30
+    // Trollocs get 3 per level up to 30
+    // All get 2 per level past that and start with 8
+
+    var per_level = 5;
+    if(faction == "trolloc") {
+        per_level = 3;
+    }
+
+    var level = 1;
+    var pracs = 8;
+
+    while(pracs < sessions) {
+        level++;
+        pracs += (level < 30 ? per_level : 2);
+    }
+
+    return level;
+
+    // TODO: Move this writing to another place
+    $("#required_level").val(level);
+
+}
+
+
+function increment_skill(current, start) {
+    // Returns the next percentage for an arbitrary skill, based
+    // on the current percentage and the starting percentage.
+    // This is really a function of the starting value.
+
+    var incr = 0;
+    if(current <= 20) {
+        // up to 20 points, you increment by your starting amount
+        // each time
+        incr = start;
+    } else if(current <= 40) {
+        incr = Math.floor(0.8 * start);
+    } else if(current <= 60) {
+        incr = Math.floor(0.5929 * start);
+    } else if(current <= 80) {
+        incr = Math.floor(0.4 * start);
+    } else if(current <= 90) {
+        incr = Math.floor(0.2 * start);
+    } else {
+        // at 90 and above, it's one point at a time
+        incr = 1;
+    }
+
+    return current + incr;
+
+}
+
+
 $(function() {
     register_events();
     build_skill_tables();
