@@ -264,8 +264,8 @@ function update_information() {
         required_pracs += sessions.hunter * 2;
     } else if(ch.cls == 'hunter') {
         required_pracs = sessions.warrior * 2;
-        required_pracs += sessions.rogue * 1;
-        required_pracs += sessions.hunter * 2;
+        required_pracs += sessions.rogue * 2;
+        required_pracs += sessions.hunter * 1;
     } else if(ch.cls == 'channeler' && ch.sex == 'female') {
         required_pracs = sessions.warrior * 4;
         required_pracs += sessions.rogue * 3;
