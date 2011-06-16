@@ -205,18 +205,52 @@ function register_events() {
 function update_information() {
     // Updates the required practices and level information
     // based on current prac usage
+    var ch = get_character_info();
+    var required_pracs = 0;
+    var required_level = 0;
 
-    // get the total number of used sessions
-    var sessions = 0;
+    // get the total number of used sessions, grouped by class
+    var sessions = {'warrior': 0, 'rogue': 0, 'hunter': 0};
     $("#skill_tables td.skill-sessions input").each(function() {
-        sessions += parseInt($(this).val());
+        var skill = $(this).parents('tr').data('skill');
+        var cls = skillsets.get_class(skill);
+        sessions[cls] += parseInt($(this).val());
     });
 
-    $("#required_pracs").html(sessions);
+    // class determines how many practices are used per session in a given
+    // class
+    // Warriors: 1 3 2
+    // Rogues: 3 1 2
+    // Hunters: 2 2 1
+    // Channelers (female): 4 3 2
+    // Channelers (male): 3 3 2
 
-    var ch = get_character_info();
-    var level = calculate_required_level(ch.faction, sessions);
-    $("#required_level").html(level);
+    if(ch.cls == 'warrior') {
+        required_pracs = sessions.warrior * 1;
+        required_pracs += sessions.rogue * 3;
+        required_pracs += sessions.hunter * 2;
+    } else if(ch.cls == 'rogue') {
+        required_pracs = sessions.warrior * 3;
+        required_pracs += sessions.rogue * 1;
+        required_pracs += sessions.hunter * 2;
+    } else if(ch.cls == 'hunter') {
+        required_pracs = sessions.warrior * 2;
+        required_pracs += sessions.rogue * 1;
+        required_pracs += sessions.hunter * 2;
+    } else if(ch.cls == 'channeler' && ch.sex == 'female') {
+        required_pracs = sessions.warrior * 4;
+        required_pracs += sessions.rogue * 3;
+        required_pracs += sessions.hunter * 2;
+    } else if(ch.cls == 'channeler' && ch.sex == 'male') {
+        required_pracs = sessions.warrior * 3;
+        required_pracs += sessions.rogue * 3;
+        required_pracs += sessions.hunter * 2;
+    }
+
+    $("#required_pracs").html(required_pracs);
+
+    required_level = calculate_required_level(ch.faction, required_pracs);
+    $("#required_level").html(required_level);
 
 }
 
