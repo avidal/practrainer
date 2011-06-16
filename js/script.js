@@ -66,8 +66,6 @@ skillsets.get_class = function(skill) {
 function build_skill_tables() {
     // builds out the actual HTML for the skill tables
     $.each(skillsets, function(cls, skillset) {
-        console.log('Building table for ' + cls);
-        //
         // get a reference to the table for this skillset
         var $table = $('#' + cls + '_skills');
         var $tbody = $table.find('tbody');
@@ -81,18 +79,17 @@ function build_skill_tables() {
             $tbody.append($row);
         });
     });
-
-    console.log('Done building skill tables.');
 }
 
 
 function register_events() {
-    console.log('Registering events.');
-
     // bind to the change event on any of the character
     // attribute options
     $("#character_info select").change(function() {
-        console.log('Character information changed.');
+        // when the character info changes, recalculate
+        // the required pracs and level
+        update_skills();
+        update_information();
     });
 
     // make sure they pick a valid class
@@ -121,6 +118,10 @@ function register_events() {
         function() {
             var skill = $(this).parents('tr').data('skill');
             update_skill(skill);
+
+            // after updating the skill, update the total practices
+            // as well as the required level
+            update_information();
         }
     );
 
@@ -180,16 +181,33 @@ function register_events() {
             // make sure the value is 0 at a minimum
             v = Math.max(v, 0);
 
-            // set the new value
-            $(this).val(v);
-
-            // and fire the change event
-            $(this).change();
+            // set the new value and fire the change event
+            $(this).val(v).change();
 
         }
     );
 
 }
+
+
+function update_information() {
+    // Updates the required practices and level information
+    // based on current prac usage
+
+    // get the total number of used sessions
+    var sessions = 0;
+    $("#skill_tables td.skill-sessions input").each(function() {
+        sessions += parseInt($(this).val());
+    });
+
+    $("#required_pracs").html(sessions);
+
+    var ch = get_character_info();
+    var level = calculate_required_level(ch.faction, sessions);
+    $("#required_level").html(level);
+
+}
+
 
 $(function() {
     register_events();
@@ -271,9 +289,6 @@ function calculate_required_level(faction, sessions) {
 
     return level;
 
-    // TODO: Move this writing to another place
-    $("#required_level").val(level);
-
 }
 
 
@@ -323,7 +338,6 @@ function increment_percentage(current, start) {
         incr = 1;
     }
 
-    console.log('Incrementing percentage by ' + incr);
     return current + incr;
 
 }
@@ -334,8 +348,6 @@ function get_percentage(skill, sessions) {
     // practice sessions spent
     var start = get_starting_percentage(skill);
     var perc = 0;
-
-    console.log('starting percentage: ' + start + ';sessions: ' + sessions);
 
     for(var i = 0; i < sessions; i++) {
         perc = increment_percentage(perc, start);
@@ -373,11 +385,19 @@ function update_skill(skill) {
     var $row = $("#skill_tables tr[data-skill=" + skill + "]");
 
     var sessions = $row.find('input').val();
-    console.log(skill + ": " + sessions);
 
     var perc = get_percentage(skill, sessions);
     $row.find('.skill-percent span').html(perc);
 
+}
+
+
+function update_skills() {
+    // Runs the update function for all skills
+    $("#skill_tables td.skill-sessions input").each(function() {
+        var skill = $(this).parents('tr').data('skill');
+        update_skill(skill);
+    });
 }
 
 // }}}
