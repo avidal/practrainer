@@ -114,7 +114,6 @@ function register_events() {
         'td.skill-sessions input',
         'keydown',
         function(evt) {
-            console.log('Key: ' + evt.which + ';shift=' + evt.shiftKey);
             /*
              * left: 37
              * up: 38
@@ -145,12 +144,20 @@ function register_events() {
             var v = parseInt($(this).val(), 10) || 0;
 
             // decrement on left, down, or minus
-            if(evt.which == 37 || evt.which == 40 || evt.which == 189 || evt.which == 109) {
+            if(evt.which == 37 || // left
+               evt.which == 40 || // down
+               evt.which == 189 || // minus (shift+_)
+               evt.which == 109) { // numpad minus
+
                 v -= 1;
             }
 
             // increment on right, up, or plus
-            if(evt.which == 39 || evt.which == 38 || evt.which == 107 || (evt.which == 187 && evt.shiftKey)) {
+            if(evt.which == 39 || // right
+                evt.which == 38 || // up
+                evt.which == 107 || // numpad plus
+                (evt.which == 187 && evt.shiftKey)) { // shift+0
+
                 v += 1;
             }
 
