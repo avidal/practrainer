@@ -228,6 +228,27 @@ function register_events() {
         }
     );
 
+    $('#skill_tables').delegate(
+        'td.skill-sessions input',
+        'mousewheel',
+        function(evt, delta) {
+
+            var v = parseInt($(this).val(), 10) || 0;
+            var incr = 0;
+
+            if(delta > 0) {
+                // scrolling upwards
+                incr = 1;
+            } else {
+                incr = -1;
+            }
+
+            v = Math.max(v + incr, 0);
+            $(this).val(v).change();
+
+        }
+    );
+
 }
 
 
