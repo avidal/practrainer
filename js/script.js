@@ -244,6 +244,7 @@ function register_events() {
             }
 
             v = Math.max(v + incr, 0);
+
             $(this).val(v).change();
 
         }
@@ -483,6 +484,16 @@ function update_skill(skill) {
     var sessions = $row.find('input').val();
 
     var perc = get_percentage(skill, sessions);
+    // if the percentage is over 99, decrease sessions until
+    // it's below 99
+    if(perc > 99) {
+        while((perc = get_percentage(skill, sessions)) > 99) {
+            sessions--;
+        }
+        // set the new number of sessions
+        $row.find('input').val(sessions);
+    }
+
     $row.find('.skill-percent span').not('span.skill-level').html(perc);
 
     // if this is a skill with levels then we should display the level
