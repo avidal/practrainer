@@ -435,6 +435,12 @@ function increment_percentage(current, start) {
         incr = 1;
     }
 
+    // make sure the increment is at least 1 percent
+    // not sure it's possible on the MUD, but using
+    // these formulae with bad enough stats you can
+    // hit a point where a skill will not increase
+    incr = Math.max(incr, 1);
+
     return current + incr;
 
 }
