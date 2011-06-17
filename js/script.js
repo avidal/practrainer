@@ -229,11 +229,18 @@ function register_events() {
     );
 
     $('#skill_tables').delegate(
-        'td.skill-sessions input',
+        'td, input',
         'mousewheel',
         function(evt, delta) {
 
-            var v = parseInt($(this).val(), 10) || 0;
+            if($(this).is('input')) {
+                var $inp = $(this);
+            } else {
+                var $inp = $(this).parents('tr').find('td.skill-sessions input');
+            }
+
+
+            var v = parseInt($inp.val(), 10) || 0;
             var incr = 0;
 
             if(delta > 0) {
@@ -245,7 +252,7 @@ function register_events() {
 
             v = Math.max(v + incr, 0);
 
-            $(this).val(v).change();
+            $inp.val(v).change();
 
         }
     );
