@@ -233,13 +233,18 @@ function register_events() {
         'mousewheel',
         function(evt, delta) {
 
+            // prevent the default event
+            evt.preventDefault();
+
             if($(this).is('input')) {
-                var $inp = $(this);
-            } else {
-                var $inp = $(this).parents('tr').find('td.skill-sessions input');
+                // if the mouse is hovering over the input, return here
+                // to prevent the handler from running twice.
+                // by default, it will bubble up to the cell containing
+                // the input, which will handle it.
+                return true;
             }
 
-
+            var $inp = $(this).parents('tr').find('td.skill-sessions input');
             var v = parseInt($inp.val(), 10) || 0;
             var incr = 0;
 
