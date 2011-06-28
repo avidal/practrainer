@@ -1,12 +1,19 @@
 #!/usr/bin/env node
 
 var fs = require('fs'),
-    http = require('http'),
+    https = require('https'),
     path = require('path')
     sys = require('sys'),
-    url = require('url'),
+    url = require('url');
 
-http.createServer(handle_request).listen(5002, '0.0.0.0');
+var options = {
+    key: fs.readFileSync('/tmp/privatekey.pem'),
+    cert: fs.readFileSync('/tmp/cert.pem')
+};
+
+var server = https.createServer(options);
+server.addListener("request", handle_request);
+server.listen(5002, '0.0.0.0');
 
 function handle_request(request, response) {
     console.log("[REQUEST] " + request.url);
@@ -71,4 +78,4 @@ function send_500(response, err) {
     return;
 }
 
-console.log('Server running at http://0.0.0.0:5002/');
+console.log('Server running at https://0.0.0.0:5002/');
