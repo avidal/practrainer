@@ -393,7 +393,7 @@ function calculate_required_level(faction, sessions) {
 
     while(pracs < sessions) {
         level++;
-        pracs += (level < 30 ? per_level : 2);
+        pracs += (level <= 30 ? per_level : 2);
     }
 
     return level;
