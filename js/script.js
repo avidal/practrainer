@@ -60,7 +60,7 @@ skillsets.get_class = function(skill) {
     });
 
     return ret;
-}
+};
 
 skillsets.has_levels = function(skill) {
     // returns whether or not the supplied skill is one that
@@ -82,7 +82,7 @@ skillsets.has_levels = function(skill) {
 
     return ret;
 
-}
+};
 
 
 function build_skill_tables() {
@@ -277,7 +277,7 @@ function update_information() {
     $("#skill_tables td.skill-sessions input").each(function() {
         var skill = $(this).parents('tr').data('skill');
         var cls = skillsets.get_class(skill);
-        sessions[cls] += parseInt($(this).val());
+        sessions[cls] += parseInt($(this).val(), 10);
     });
 
     // class determines how many practices are used per session in a given
@@ -418,7 +418,7 @@ function get_starting_percentage(skill) {
     }
 
     if(cls == 'hunter') {
-        return Math.floor((ch.str + ch.int + ch.wil + ch.dex) / 4.0)
+        return Math.floor((ch.str + ch.int + ch.wil + ch.dex) / 4.0);
     }
 
 }
@@ -480,7 +480,7 @@ function get_skill_percentage(skill) {
 
 
 function get_character_info() {
-    var ch = {}
+    var ch = {};
     ch.sex = $("#sex").val();
     ch.faction = $("#faction").val();
     ch.cls = $("#class").val();
